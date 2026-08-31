@@ -56,17 +56,34 @@ Cosine similarity
 
 ## Q3. FAISS uses ANN (Approximate Nearest Neighbour) search. What does "approximate" mean here and why is it acceptable?
 
-Approximate Nearest Neighbour (ANN) search means that the system tries to find vectors that are very close to the query without necessarily checking every vector in the database.
+Approximate Nearest Neighbour (ANN) search means finding vectors that are very similar to the query without necessarily checking every vector in the database.
 
-An exact search guarantees the true nearest neighbours, but it can become computationally expensive when the database contains millions or billions of vectors.
+An exact search checks all vectors and guarantees the true nearest neighbours. However, this can become slow and expensive when the database contains millions or billions of vectors.
 
-ANN methods trade a small amount of accuracy for significantly faster search.
+ANN methods make a trade-off between **speed and accuracy**.
 
-This trade-off is acceptable in many real-world applications because:
+### Approximate Search
 
-- Search becomes much faster.
-- Less computational resources are required.
-- The retrieved results are usually highly relevant.
-- It allows vector search to scale to very large datasets.
+- It searches for highly similar vectors.
+- It is faster than checking every vector.
+- It requires fewer computational resources.
+- It may not always return the exact nearest neighbour.
 
-> **Note:** `IndexFlatL2`, which is used in this assignment, actually performs an **exact nearest-neighbour search**, not an approximate search. ANN indexes in FAISS include methods such as IVF and HNSW, which are designed for faster searches on large datasets.
+### Why is it acceptable?
+
+A small reduction in accuracy is often acceptable because the retrieved results are still highly relevant while the search becomes much faster.
+
+This is especially useful in large-scale applications such as **RAG systems**, where the vector database may contain millions of documents or chunks.
+
+### Important Note
+
+`IndexFlatL2`, which is used in this assignment, actually performs an **exact nearest-neighbour search**, not an approximate search.
+
+FAISS also provides approximate search indexes such as **IVF** and **HNSW**, which are more suitable for very large datasets.
+
+### Summary
+
+| Search Type | Accuracy | Speed | Use Case |
+|---|---|---|---|
+| Exact Search | Highest | Slower | Small/medium datasets |
+| Approximate Search (ANN) | Very high | Faster | Large-scale datasets |
