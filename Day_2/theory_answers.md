@@ -38,7 +38,7 @@ FAISS's `IndexFlatIP` only computes the raw dot product (\(A \cdot B\)), without
 So normalization is what lets `IndexFlatIP` behave as a cosine similarity search — it removes magnitude from the equation and leaves only the semantic direction of the vectors.
 
 **Process:**
-``text
+```text
 Original vector
       ↓
 Normalization
