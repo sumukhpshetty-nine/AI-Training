@@ -1,89 +1,69 @@
 # Day 2 — FAISS Theory Questions
 
-## Q1. What is the difference between IndexFlatL2 and IndexFlatIP in FAISS? When would you use each?
+## Q1. Difference between `IndexFlatL2` and `IndexFlatIP`
 
-`IndexFlatL2` uses Euclidean (L2) distance to measure how close two vectors are.
+FAISS supports different distance/similarity metrics depending on the index type. `IndexFlatL2` and `IndexFlatIP` differ in how they measure closeness between vectors.
 
-`IndexFlatIP` uses Inner Product (IP) to measure similarity between vectors.
+**`IndexFlatL2`**
+- Uses **Euclidean (L2) distance** to measure how far apart two vectors are.
+- A **smaller distance** indicates higher similarity.
+- Best suited when the actual geometric distance between vectors matters — for example, when vector magnitude carries meaningful information.
 
-### IndexFlatL2
+**`IndexFlatIP`**
+- Uses **Inner Product (dot product)** to measure similarity.
+- A **larger inner product** indicates higher similarity.
+- If embeddings are **normalized to unit length**, the inner product becomes mathematically equivalent to **cosine similarity**.
+- Commonly used when cosine similarity is the desired metric (typical in text/semantic search).
 
-It calculates the Euclidean distance between vectors.
+**Summary**
 
-A smaller distance means that the vectors are more similar.
-
-It can be used when Euclidean distance is the desired similarity measure.
-
-### IndexFlatIP
-
-It calculates the inner product between vectors.
-
-A larger inner product means greater similarity.
-
-When embeddings are normalized to unit length, inner product becomes equivalent to cosine similarity.
-
-Therefore, `IndexFlatIP` is commonly used when cosine similarity is required.
-
-### Summary
-
-| Index | Measures | Better Match |
-|---|---|---|
-| `IndexFlatL2` | Euclidean distance | Smaller value |
-| `IndexFlatIP` | Inner product | Larger value |
-
----
-
-## Q2. Why do we normalise embeddings before adding to FAISS when we want cosine similarity?
-
-Cosine similarity measures the angle between two vectors rather than their magnitude.
-
-When vectors are normalized to unit length, the inner product between two vectors becomes equal to their cosine similarity.
-
-Therefore, normalization allows FAISS to compare vectors based mainly on their direction or semantic meaning rather than their magnitude.
-
-For example:
-
-```text
-Original vector
-      ↓
-Normalization
-      ↓
-Unit-length vector
-      ↓
-Cosine similarity
-
----
-
-## Q3. FAISS uses ANN (Approximate Nearest Neighbour) search. What does "approximate" mean here and why is it acceptable?
-
-Approximate Nearest Neighbour (ANN) search means finding vectors that are very similar to the query without necessarily checking every vector in the database.
-
-An exact search checks all vectors and guarantees the true nearest neighbours. However, this can become slow and expensive when the database contains millions or billions of vectors.
-
-ANN methods make a trade-off between **speed and accuracy**.
-
-### Approximate Search
-
-- It searches for highly similar vectors.
-- It is faster than checking every vector.
-- It requires fewer computational resources.
-- It may not always return the exact nearest neighbour.
-
-### Why is it acceptable?
-
-A small reduction in accuracy is often acceptable because the retrieved results are still highly relevant while the search becomes much faster.
-
-This is especially useful in large-scale applications such as **RAG systems**, where the vector database may contain millions of documents or chunks.
-
-### Important Note
-
-`IndexFlatL2`, which is used in this assignment, actually performs an **exact nearest-neighbour search**, not an approximate search.
-
-FAISS also provides approximate search indexes such as **IVF** and **HNSW**, which are more suitable for very large datasets.
-
-### Summary
-
-| Search Type | Accuracy | Speed | Use Case |
+| Index | Metric | Better Match | Typical Use Case |
 |---|---|---|---|
-| Exact Search | Highest | Slower | Small/medium datasets |
-| Approximate Search (ANN) | Very high | Faster | Large-scale datasets |
+| `IndexFlatL2` | Euclidean distance | Smaller value | Distance-sensitive tasks, raw (unnormalized) embeddings |
+| `IndexFlatIP` | Inner product | Larger value | Cosine-similarity search (requires normalized vectors) |
+
+---
+
+## Q2. Why normalize embeddings before adding them to FAISS for cosine similarity?
+
+Cosine similarity is defined as the **cosine of the angle** between two vectors — it captures *direction*, not magnitude:
+
+$$\cos(\theta) = \frac{A \cdot B}{\|A\| \|B\|}$$
+
+FAISS's `IndexFlatIP` only computes the raw dot product (\(A \cdot B\)), without dividing by the vector norms. This means:
+
+- If vectors are **not normalized**, the inner product is influenced by both direction *and* magnitude, which can distort similarity rankings (a longer vector could score higher even if less semantically similar).
+- If vectors are **normalized to unit length** (\(\|A\| = \|B\| = 1\)), the denominator becomes 1, and the dot product becomes **exactly equal to cosine similarity**.
+
+So normalization is what lets `IndexFlatIP` behave as a cosine similarity search — it removes magnitude from the equation and leaves only the semantic direction of the vectors.
+
+**Process:**
+
+
+---
+
+## Q3. What does "approximate" mean in ANN search, and why is it acceptable?
+
+**Approximate Nearest Neighbour (ANN)** search finds vectors that are *very close* to a query vector without exhaustively comparing it against every vector in the database.
+
+This is in contrast to **exact search**, which checks all vectors and guarantees the true nearest neighbours — but becomes computationally expensive as the dataset grows to millions or billions of vectors.
+
+ANN methods trade a small amount of accuracy for a large gain in speed and efficiency.
+
+**Characteristics of approximate search:**
+- Retrieves highly similar (not always the mathematically closest) vectors.
+- Much faster than brute-force comparison.
+- Uses less memory and computation.
+- May occasionally miss the single true nearest neighbour.
+
+**Why this trade-off is acceptable:**
+In practice, the small drop in exactness rarely affects usefulness — the results returned are still highly relevant. This makes ANN ideal for large-scale applications such as **RAG (Retrieval-Augmented Generation) systems**, where the vector store may contain millions of document chunks and query latency matters more than perfect precision.
+
+> **Note:** `IndexFlatL2` (used in this assignment) actually performs **exact** nearest-neighbour search — it compares the query against every stored vector. FAISS also offers genuinely approximate indexes like **IVF** and **HNSW**, designed for large-scale datasets where exact search would be too slow.
+
+**Summary**
+
+| Search Type | Accuracy | Speed | Best Use Case |
+|---|---|---|---|
+| Exact Search (e.g., `IndexFlatL2`) | Highest | Slower on large data | Small/medium datasets |
+| Approximate Search (ANN, e.g., IVF, HNSW) | Very high (not guaranteed exact) | Much faster | Large-scale datasets (millions+ vectors) |
