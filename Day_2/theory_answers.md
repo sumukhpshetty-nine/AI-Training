@@ -46,6 +46,7 @@ Normalization
 Unit-length vector
       ↓
 Cosine similarity
+```
 
 ---
 
