@@ -1,0 +1,52 @@
+Previous Meeting Notes — Acme Corp
+
+Meeting Date: August 20, 2026
+
+Attendees:
+- Sarah Johnson — Director of Operations, Acme Corp
+- Michael Chen — Engineering Manager, Acme Corp
+- David Wilson — Product Manager, Acme Corp
+- Project Team
+
+Meeting Summary:
+
+The team discussed the current progress of the online ordering platform modernization project.
+
+Acme Corp raised concerns about delays in the API integration.
+
+The client also reported that order processing becomes slower during peak traffic periods.
+
+The project team explained that additional performance testing is required before the next release.
+
+Sarah Johnson requested a revised project timeline.
+
+Michael Chen requested additional information about the API performance test results.
+
+Key Discussion Points:
+
+1. API integration is behind the original schedule.
+2. Performance testing needs to be completed.
+3. Order processing performance during peak hours needs improvement.
+4. A revised project timeline needs to be shared with the client.
+
+Open Action Items:
+
+1. Engineering team to complete API integration.
+   Owner: Engineering Team
+   Status: In Progress
+
+2. Complete performance testing.
+   Owner: QA Team
+   Status: Pending
+
+3. Share revised project timeline with Acme Corp.
+   Owner: Project Manager
+   Status: Pending
+
+4. Share API performance test results with Michael Chen.
+   Owner: Engineering Team
+   Status: Pending
+
+Next Meeting Objective:
+
+Review project progress, discuss the revised timeline, and address Acme Corp's concerns regarding API performance and order processing delays.
